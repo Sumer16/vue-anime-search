@@ -3,25 +3,45 @@
     <header>
       <h1>Vue<strong>Anime</strong></h1>
       
-      <form class="search-box">
-        <input type="search" class="search-field" name="" id="" placeholder="Search for an Anime..." required />
+      <form class="search-box" v-on:submit.prevent="handleSearch">
+        <input type="search" class="search-field" name="" id="" placeholder="Search for an Anime..." v-model="search_query" required />
       </form>
     </header>
     <main>
-      <div class="cards">
-        <Cards />
+      <div class="cards" v-if="animeList.length > 0">
+        <Cards v-for="anime in animeList" :key="anime.mal_id" :anime='anime' />
+      </div>
+      <div class="no-results" v-else>
+        <h3>Sorry, we have not results...</h3>
       </div>
     </main>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue';
 import Cards from './components/Cards';
 
 export default {
+  components: {
+    Cards
+  },
   setup() {
+    const search_query = ref('');
+    const animeList = ref([]);
+
+    const handleSearch = async () => {
+      animeList.value = await fetch(`https://api.jikan.moe/v3/search/anime?q=${search_query.value}`)
+                              .then(res => res.json())
+                              .then(data => data.results)
+      search_query.value = '';
+    };
+
     return {
-      Cards
+      Cards,
+      search_query,
+      animeList,
+      handleSearch
     }
   }
 }
@@ -93,4 +113,23 @@ header{
   }
 }
 
+main{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 30px;
+  padding-right: 30px;
+
+  .cards{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -8px;
+  }
+}
+
+.no-results{
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>
