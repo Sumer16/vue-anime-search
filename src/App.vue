@@ -12,7 +12,7 @@
         <Cards v-for="anime in animeList" :key="anime.mal_id" :anime='anime' />
       </div>
       <div class="no-results" v-else>
-        <h3>Sorry, no results found 🔍...</h3>
+        <h3>Sorry, no results found...🔍</h3>
       </div>
     </main>
   </div>
